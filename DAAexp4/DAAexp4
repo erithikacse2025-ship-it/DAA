@@ -1,0 +1,66 @@
+import heapq
+
+# --- Dijkstra Algorithm ---
+def dijkstra(n, adj, source):
+    dist = [float('inf')] * n
+    parent = [-1] * n
+    dist[source] = 0
+
+    pq = [(0, source)]  # (distance, vertex)
+
+    while pq:
+        d, u = heapq.heappop(pq)
+
+        for v, w in adj.get(u, []):
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                parent[v] = u
+                heapq.heappush(pq, (dist[v], v))
+
+    return dist, parent
+
+
+# --- Print Function (Correct Format) ---
+def print_dijkstra(dist, parent, n, source):
+    print("\nVertex   Distance        Path")
+    print("-------------------------------------------")
+
+    for v in range(n):
+        d = dist[v] if dist[v] != float('inf') else 'INF'
+
+        # Build path
+        path = []
+        current = v
+        while current != -1:
+            path.append(current)
+            current = parent[current]
+
+        path.reverse()
+        path_str = " -> ".join(map(str, path))
+
+        print(f"{v:>6} {str(d):>10} {path_str:>20}")
+
+
+# --- Graph Definition ---
+n = 7
+edges = [
+    (0, 1, 4), (0, 3, 5),
+    (1, 2, 2), (1, 3, 1),
+    (2, 4, 3),
+    (3, 4, 2), (3, 5, 6),
+    (4, 5, 1), (4, 6, 7),
+    (5, 6, 3)
+]
+
+# Convert to adjacency list
+adj = {}
+for u, v, w in edges:
+    adj.setdefault(u, []).append((v, w))
+    adj.setdefault(v, []).append((u, w))  # Undirected graph
+
+# Run Dijkstra
+source = 0
+dist, parent = dijkstra(n, adj, source)
+
+# Print result
+print_dijkstra(dist, parent, n, source)
